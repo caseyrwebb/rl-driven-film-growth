@@ -1,0 +1,12 @@
+{
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.rulers": [88],
+    "editor.formatOnType": true
+  },
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportAttributeAccessIssue": "none",
+    "reportCallIssue": "none"
+  }
+}

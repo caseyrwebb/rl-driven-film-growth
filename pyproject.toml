@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rl-driven-film-growth"
+version = "0.0.1"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy==2.2.5",
+    "gymnasium==1.1.1",
+    "stable_baselines3==2.6.0",
+    "torch==2.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black==25.1.0", 
+    "isort==6.0.1", 
+    "pylint==3.3.7", 
+    "pytest==8.4.0",
+    "jupyter==1.1.1",
+    "ipykernel==6.29.5",
+    "matplotlib==3.10.1",
+    "seaborn==0.13.2",
+    "pandas==2.2.3",
+    "pre_commit==4.2.0",
+    "nbstripout==0.8.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["src"]
+skip = ["venv", ".venv", "build", "dist"]
+
+[tool.pylint]
+max-line-length = 88
+disable = [
+    "invalid-name",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-locals",
+    "unnecessary-pass",
+    "too-many-instance-attributes",
+]
+
+[tool.pylint.typecheck]
+# allow any attribute on the cantera namespace
+generated-members = [
+    "cantera.*",
+    "ct.*"
+    ]

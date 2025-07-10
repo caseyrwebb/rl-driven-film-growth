@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Format with Black",
+      "type": "shell",
+      "command": "black",
+      "args": ["src", "tests", "scripts", "notebooks"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sort imports with isort",
+      "type": "shell",
+      "command": "isort",
+      "args": ["src", "tests", "scripts", "notebooks"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Format All",
+      "dependsOn": ["Format with Black", "Sort imports with isort"],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "Lint with Pylint",
+      "type": "shell",
+      "command": "pylint",
+      "args": ["src", "tests", "--rcfile=pyproject.toml"],
+      "group": "test",
+      "problemMatcher": ["$pylint"]
+    }
+  ]
+}

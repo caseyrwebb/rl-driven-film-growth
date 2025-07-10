@@ -1,0 +1,27 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+        args: [src]
+      - id: isort
+        name: isort
+        entry: isort
+        language: system
+        types: [python]
+        args: [src]
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: [src, --rcfile=pyproject.toml]
+      - id: nbstripout
+        name: nbstripout
+        entry: nbstripout
+        language: system
+        types: [jupyter]
+        args: []

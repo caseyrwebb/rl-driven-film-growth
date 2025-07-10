@@ -1,0 +1,89 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# PyCharm settings
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+.pytest_cache/
+
+# mypy / type checker
+.mypy_cache/
+.dmypy.json
+.pytype/
+
+# Linting
+.pylint.d/
+
+# Sphinx documentation
+docs/_build/
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.log
+
+# Distribution/packaging
+*.egg
+*.whl
+
+# Installer logs
+pip-log.txt
+
+# Test output
+tests/output/
+tests/tmp/
+tests/__pycache__/
+
+# Data files (if any get generated during runs)
+*.h5
+*.csv
+*.db
+*.sqlite3
+
+# Pre-commit
+.pre-commit-cache/
+pre-commit.log
+
+# Jupyter kernel
+.ipynb_kernel/
+
+# Coverage
+coverage.xml
+
+# Local config
+local_settings.py
+
+# Python environment variables
+.python-version
+
+# Node modules
+node_modules/
+
+# Editor swap files
+*~
+*.swp
+*.swo
