@@ -9,6 +9,10 @@ from stable_baselines3 import DQN
 from stable_baselines3.common.env_checker import check_env
 
 from cvd_env.reactor_env import CVDReactorEnv
+from utils.logger import get_logger, setup_logging
+
+setup_logging()
+logger = get_logger(__name__)
 
 
 def train_dqn(
@@ -46,9 +50,11 @@ def evaluate_dqn(model: DQN, env: CVDReactorEnv, n_episodes: int = 1) -> None:
             obs, _, terminated, truncated, info = env.step(int(action))
             env.render()
             done = terminated or truncated
-        print(
-            f"Episode {episode+1}: Final thickness: {obs[0]:.2f} nm, "
-            f"Error: {info['thickness_error']:.2f} nm"
+        logger.info(
+            "Episode %d: Final thickness: %.2f nm, Error: %.2f nm",
+            episode + 1,
+            obs[0],
+            info["thickness_error"],
         )
         env.plot()
 

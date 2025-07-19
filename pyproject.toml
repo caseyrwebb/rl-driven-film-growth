@@ -54,6 +54,8 @@ disable = [
     "too-many-locals",
     "unnecessary-pass",
     "too-many-instance-attributes",
+    "too-many-positional-arguments",
+    "duplicate-code"
 ]
 
 [tool.pylint.typecheck]
