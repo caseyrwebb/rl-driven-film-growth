@@ -46,21 +46,31 @@ simulation robustness:
      practical deployment.
 """
 
+from typing import TypedDict
+
 from agents.dqn_trainer import train_dqn
 from cvd_env.reactor_env import CVDReactorEnv
 from utils.logger import get_logger, setup_logging
 
-setup_logging()
-
 logger = get_logger(__name__)
 
 
-def run_arrhenius_sweep():
+class SweepResult(TypedDict):
+    """Type definition for Arrhenius sweep result."""
+
+    k0: float
+    Ea: float
+    alpha: float
+    error: float
+    final_T: float
+    final_F: float
+
+
+def run_arrhenius_sweep(
+    k0_list: list[float], Ea_list: list[int], alpha_list: list[float]
+) -> list[SweepResult]:
     """Run a sweep over Arrhenius parameters for the CVD reactor environment."""
     logger.info("Starting Arrhenius parameter sweep...")
-    k0_list = [1e14, 3.16e15, 1e16]  # s^-1
-    Ea_list = [230000, 237794, 250000]  # J/mol
-    alpha_list = [1.0]  # First order
     results = []
     for k0 in k0_list:
         for Ea in Ea_list:
@@ -94,6 +104,17 @@ def run_arrhenius_sweep():
                         "final_F": obs[2],
                     }
                 )
+    return results
+
+
+if __name__ == "__main__":
+    setup_logging()
+
+    _k0_list = [1e14, 3.16e15, 1e16]  # s^-1
+    _Ea_list = [230000, 237794, 250000]  # J/mol
+    _alpha_list = [1.0]  # First order
+    sweep_results = run_arrhenius_sweep(_k0_list, _Ea_list, _alpha_list)
+
     logger.info("\n==== Arrhenius Sweep Results ====")
     logger.info(
         "%10s  %10s  %7s  %12s  %10s  %14s",
@@ -104,7 +125,7 @@ def run_arrhenius_sweep():
         "final_T (K)",
         "final_F (sccm)",
     )
-    for r in results:
+    for r in sweep_results:
         logger.info(
             "%10.2e  %10.0f  %7.2f  %12.2f  %10.2f  %14.2f",
             r["k0"],
@@ -114,7 +135,3 @@ def run_arrhenius_sweep():
             r["final_T"],
             r["final_F"],
         )
-
-
-if __name__ == "__main__":
-    run_arrhenius_sweep()

@@ -32,7 +32,7 @@ from utils.plots import plot_trajectories
 logger = get_logger(__name__)
 
 
-class CVDReactorEnv(gym.Env[NDArray[np.float32], np.ndarray]):
+class CVDReactorEnv(gym.Env[NDArray[np.float32], np.int64]):
     """A Gymnasium environment for a simplified CVD reactor.
 
     The environment models film deposition using an Arrhenius equation, with
