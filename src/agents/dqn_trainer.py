@@ -11,7 +11,6 @@ from stable_baselines3.common.env_checker import check_env
 from cvd_env.reactor_env import CVDReactorEnv
 from utils.logger import get_logger, setup_logging
 
-setup_logging()
 logger = get_logger(__name__)
 
 
@@ -60,6 +59,8 @@ def evaluate_dqn(model: DQN, env: CVDReactorEnv, n_episodes: int = 1) -> None:
 
 
 if __name__ == "__main__":
+    setup_logging()
+
     test_env = CVDReactorEnv(target_thickness=100.0, max_steps=50)
     test_model = train_dqn(test_env, total_timesteps=5000)
     evaluate_dqn(test_model, test_env, n_episodes=1)
