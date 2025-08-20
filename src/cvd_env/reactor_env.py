@@ -52,6 +52,11 @@ class CVDReactorEnv(gym.Env[NDArray[np.float32], np.int64]):
         P: float = 1e5,
         V: float = 1e-3,
         mode: str = "real",
+        wafer_area_m2: float = 0.01,
+        film_density_kg_m3: float = 2330.0,
+        film_molar_mass_kg_mol: float = 0.0280855,
+        deposition_yield: float = 1e-4,
+        scale_output_to_nms: bool = True,
     ):
         """Initialize the CVD reactor environment.
 
@@ -112,24 +117,52 @@ class CVDReactorEnv(gym.Env[NDArray[np.float32], np.int64]):
         self.T_history: list[float] = []
         self.F_history: list[float] = []
 
+        self.wafer_area_m2 = wafer_area_m2
+        self.film_density = film_density_kg_m3
+        self.film_molar_mass = film_molar_mass_kg_mol
+        self.deposition_yield = deposition_yield
+        self.scale_output_to_nms = scale_output_to_nms
+        # Precompute scale: (V/A)*y*(M/ρ)*1e9  ->  [nm·m^3 / mol]
+        self._nm_scale = (
+            (self.V / self.wafer_area_m2)
+            * self.deposition_yield
+            * (self.film_molar_mass / self.film_density)
+            * 1e9
+        )
+
     def _get_deposition_rate(self, T: float, F: float) -> float:
         """
         Calculate deposition rate based on temperature and flow rate.
+
         Args:
             T (float): Temperature in Kelvin.
-            F (float): Flow rate in sccm (standard cm^3/min).
+            F (float): Flow rate in sccm.
+
         Returns:
-            float: Deposition rate in nm/s.
+            float: Deposition rate in nm/s (scaled). If `scale_output_to_nms=False`,
+                returns an unscaled growth proxy.
         """
         if self.mode == "toy":
-            return self.k0 * (F**self.alpha) * np.exp(-self.Ea / (self.R * T))
+            base = self.k0 * (F**self.alpha) * np.exp(-self.Ea / (self.R * T))
+            return (
+                float(self._nm_scale * base)
+                if self.scale_output_to_nms
+                else float(base)
+            )
+
         if self.mode == "real":
             P = self.P  # Pa
             V = self.V  # m^3
             k = self.k0 * np.exp(-self.Ea / (self.R * T))  # s^-1
-            F_mol = (F * P) / (self.R * T * 60)  # mol/s
+            F_mol = (F * P) / (self.R * T * 60.0)  # mol/s
             conc = F_mol / V  # mol/m^3
-            return k * conc
+            base = k * conc  # mol/(m^3 s)
+            return (
+                float(self._nm_scale * base)
+                if self.scale_output_to_nms
+                else float(base)
+            )
+
         raise ValueError(f"Unknown mode {self.mode!r} in _get_deposition_rate")
 
     def reset(
