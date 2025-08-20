@@ -74,6 +74,52 @@ def proportional_policy(
     return int(best_idx)
 
 
+def _nearest_action_index(env: CVDReactorEnv, goal_dT: float, goal_dF: float) -> int:
+    """
+    Pick the discrete action (ΔT, ΔF) closest to a desired 'goal' move.
+    """
+    return int(
+        np.argmin(
+            [(dT - goal_dT) ** 2 + (dF - goal_dF) ** 2 for (dT, dF) in env.action_map]
+        )
+    )
+
+
+def step_ramp_policy(
+    env: CVDReactorEnv,
+    state: NDArray[np.float32],
+    t_phase: float = 0.80,
+    f_phase: float = 0.95,
+    coast_band: float = 1.0,
+) -> int:
+    """
+    Step-ramp baseline:
+      1) Ramp temperature early to accelerate growth (goal ΔT=+10, ΔF=0)
+      2) Hold T and nudge flow as we approach target (goal ΔT=0, ΔF=+5)
+      3) Coast near the target (goal ΔT=0, ΔF=0)
+      4) If we overshoot or are extremely close, gently back off (goal ΔT=-10, ΔF=-5)
+
+    This mirrors a common "heat first, then trim with flow, then hold" heuristic.
+    """
+    h, _, _ = state
+    target = env.h_target
+    error = float(target - h)
+
+    if h < t_phase * target:
+        goal_dT, goal_dF = 10.0, 0.0  # ramp T
+    elif h < f_phase * target:
+        goal_dT, goal_dF = 0.0, 5.0  # feather with F
+    elif abs(error) <= coast_band:
+        goal_dT, goal_dF = 0.0, 0.0  # coast near target
+    elif error < 0:  # overshoot
+        goal_dT, goal_dF = -10.0, -5.0  # back off
+    else:
+        # Slightly below target but past F-phase: keep holding; let dynamics finish
+        goal_dT, goal_dF = 0.0, 0.0
+
+    return _nearest_action_index(env, goal_dT, goal_dF)
+
+
 if __name__ == "__main__":
     setup_logging()
     logger.info("=== Manual Policies Demo ===")
@@ -90,6 +136,7 @@ if __name__ == "__main__":
     policies = {
         "Always Max": always_max_policy,
         "Proportional": proportional_policy,
+        "Step Ramp": step_ramp_policy,
         "Random": lambda env, _: random_policy(env),
     }
 
